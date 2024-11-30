@@ -42,7 +42,7 @@ class TalentRecommender:
         self.X[numerical_cols] = self.scaler.fit_transform(self.X[numerical_cols])
 
     def fit_model(self):
-        self.model = NearestNeighbors(n_neighbors=5, metric='cosine')
+        self.model = NearestNeighbors(n_neighbors=10, metric='cosine')
         self.model.fit(self.X)
 
     def get_enum_name_by_value(self, enum_class, value):        
@@ -98,7 +98,7 @@ class TalentRecommender:
                 if tech == primary_tech:
                     input_vector[tech] = seniority_value  # Use the actual seniority level for primary tech
                 else:
-                    input_vector[tech] = 0# One level lower for secondary skills
+                    input_vector[tech] = 1# One level lower for secondary skills
         
         # Scale numerical features
         numerical_cols = ['weekly_available_hours', 'importance','availability']
@@ -106,7 +106,7 @@ class TalentRecommender:
         
         return input_vector
 
-    def get_recommendations(self, request_data, n_recommendations=5):
+    def get_recommendations(self, request_data):
         
         input_vector = self.create_input_vector(request_data)
         # Find nearest neighbors
@@ -139,7 +139,7 @@ class TalentRecommender:
         return recommendations
 
 # Initialize recommender
-csv_path = os.path.join('output', 'consolidated_team_data-2.csv')
+csv_path = os.path.join('output', 'output.csv')
 recommender = TalentRecommender(csv_path)
 
 
