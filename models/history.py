@@ -7,13 +7,13 @@ class HistoryModel(connection.Model):
     id = Column(type_=types.UUID, default=uuid4, primary_key=True, unique=True)
     createdAt = Column(name='created_at', type_=types.TIMESTAMP, server_default=func.now())
     seniority = Column(type_=types.Text, nullable=False)
-    englishLevel = Column(type_=types.Text, nullable=False, name='english_level')
+    english = Column(type_=types.Text, nullable=False)
     techStacks = Column(type_=types.ARRAY(types.Text), nullable=False, name='tech_stacks')
     primaryTechStack = Column(type_=types.Text, nullable=False, name='primary_tech_stack')
     hoursPerWeek = Column(type_=types.Integer, nullable=False, name='hours_per_week')
     teamLead = Column(type_=types.Boolean, default=False, name='team_lead')
     flexibleSchedule = Column(type_=types.Boolean, default=False, name='flexible_schedule')
-    result = Column(type_=types.JSON, nullable=True)
+    result = Column(type_=types.ARRAY(types.JSON), nullable=False)
 
     userId = Column(ForeignKey(column='users.id'), type_=types.UUID, nullable=False, name='user_id')
 
