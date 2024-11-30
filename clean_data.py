@@ -1,10 +1,10 @@
+# This script is to clean and process data from Mission Board, 
+
 import pandas as pd
 import json
-from datetime import datetime
 import os
 import random
 from enum import Enum
-import numpy as np
 
 class EnglishLevel(Enum):
     ADVANCED = '3'
