@@ -130,7 +130,7 @@ class TalentRecommender:
             })
         
         # Sort by similarity score in descending order
-        recommendations.sort(key=lambda x: x['similarity_score'], reverse=True)
+        recommendations.sort(key=lambda x: x['similarity_score'], reverse=False)
         
         return recommendations
 
