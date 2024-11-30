@@ -28,17 +28,17 @@ class TalentRecommender:
         # Get tech stack columns (excluding non-tech columns)
         basic_cols = ['id', 'name', 'weekly_available_hours', 'seniority_level', 
                      'english_level', 'number_of_assignments', 'active_assignments', 
-                     'assignment_avg', 'tag_names']
+                     'importance','availability' , 'tag_names']
         self.tech_cols = [col for col in self.df.columns if col not in basic_cols]
         
         # Prepare feature matrix
         feature_cols = ['weekly_available_hours', 'seniority_level', 'english_level', 
-                       'assignment_avg'] + self.tech_cols
+                       'importance', 'availability'] + self.tech_cols
         self.X = self.df[feature_cols].copy()
         
         # Scale numerical features
         self.scaler = StandardScaler()
-        numerical_cols = ['weekly_available_hours', 'assignment_avg']
+        numerical_cols = ['weekly_available_hours', 'importance','availability']
         self.X[numerical_cols] = self.scaler.fit_transform(self.X[numerical_cols])
 
     def fit_model(self):
@@ -84,7 +84,8 @@ class TalentRecommender:
         input_vector['weekly_available_hours'] = request_data.get('hoursPerWeek', 0)
         input_vector['seniority_level'] = self.map_seniority(request_data.get('seniorityLevel', 'MID'))
         input_vector['english_level'] = self.map_english(request_data.get('englishLevel', 'PROFICIENT'))
-        input_vector['assignment_avg'] = 0  # Default value
+        input_vector['importance'] = 0  # Default value
+        input_vector['availability'] = 0  # Default value
         
         # Fill tech stack
         tech_stack = request_data.get('techStack', [])
@@ -100,14 +101,14 @@ class TalentRecommender:
                     input_vector[tech] = 0# One level lower for secondary skills
         
         # Scale numerical features
-        numerical_cols = ['weekly_available_hours', 'assignment_avg']
+        numerical_cols = ['weekly_available_hours', 'importance','availability']
         input_vector[numerical_cols] = self.scaler.transform(input_vector[numerical_cols])
         
         return input_vector
 
     def get_recommendations(self, request_data, n_recommendations=5):
-        input_vector = self.create_input_vector(request_data)
         
+        input_vector = self.create_input_vector(request_data)
         # Find nearest neighbors
         distances, indices = self.model.kneighbors(input_vector)
         
@@ -117,6 +118,8 @@ class TalentRecommender:
             profile = self.df.iloc[idx]
             tech_skills = {tech: self.invert_map_seniority(int(profile[tech])) for tech in self.tech_cols if profile[tech] > 0}
             
+            availability = int(profile['availability']) - int(request_data['days'])
+            
             recommendations.append({
                 'id': profile['id'],
                 'name': profile['name'],
@@ -125,7 +128,8 @@ class TalentRecommender:
                 'seniority_level': self.invert_map_seniority(int(profile['seniority_level'])),
                 'english_level': self.invert_map_english(int(profile['english_level'])),
                 'tech_skills': tech_skills,
-                'assignment_avg': int(profile['assignment_avg']),
+                'importance': int(profile['importance']),
+                'availability': 0 if (availability) < 0 else availability ,
                 'active_assignments': int(profile['active_assignments'])
             })
         
@@ -135,7 +139,7 @@ class TalentRecommender:
         return recommendations
 
 # Initialize recommender
-csv_path = os.path.join('output', 'consolidated_team_data.csv')
+csv_path = os.path.join('output', 'consolidated_team_data-2.csv')
 recommender = TalentRecommender(csv_path)
 
 

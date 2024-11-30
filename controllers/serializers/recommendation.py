@@ -8,3 +8,4 @@ class RecommendationSerializer(Schema):
     hoursPerWeek = fields.Int(required=True)
     teamLead = fields.Bool()
     flexibleSchedule = fields.Bool()
+    days = fields.Int(required=True)

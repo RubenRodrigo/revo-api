@@ -209,7 +209,7 @@ def main():
         files['member_tags']
     )
     
-    json_output_path = os.path.join(output_dir, 'consolidated_team_data.json')
+    json_output_path = os.path.join(output_dir, 'consolidated_team_data-2.json')
     with open(json_output_path, 'w') as f:
         json.dump(consolidated_data, f, indent=2)
     
@@ -218,8 +218,9 @@ def main():
         base_record = {k: v for k, v in member.items() if k not in ['tags', 'assignments']}
         base_record['number_of_assignments'] = len(member['assignments'])
         base_record['active_assignments'] = sum(1 for a in member['assignments'] if a['status'] == 'active')
-        base_record['assignment_avg'] = round(random.uniform(0, 100))
+        base_record['importance'] = round(random.uniform(0, 100))
         base_record['tag_names'] = ', '.join([tag['name'] for tag in member['tags']])
+        base_record['availability'] = round(random.uniform(21, 180))
 
         # Create dictionary of member's tags and their seniority levels
         # Don't convert to lowercase since we're using numbers
@@ -236,14 +237,14 @@ def main():
 
     # Arrange columns with basic info first, then tag columns
     basic_cols = ['id', 'name', 'weekly_available_hours', 'seniority_level', 
-                 'english_level', 'number_of_assignments', 'active_assignments', 'assignment_avg', 'tag_names']
+                 'english_level', 'number_of_assignments', 'active_assignments', 'importance', 'tag_names','availability']
     tag_cols = sorted(all_tags)
 
    # Reorder columns
     df = df[basic_cols + tag_cols]
 
     # Save to CSV
-    csv_output_path = os.path.join(output_dir, 'consolidated_team_data.csv')
+    csv_output_path = os.path.join(output_dir, 'consolidated_team_data-2.csv')
     df.to_csv(csv_output_path, index=False)
     
     print("Consolidated data has been generated successfully!")

@@ -13,6 +13,7 @@ class HistoryModel(connection.Model):
     hoursPerWeek = Column(type_=types.Integer, nullable=False, name='hours_per_week')
     teamLead = Column(type_=types.Boolean, default=False, name='team_lead')
     flexibleSchedule = Column(type_=types.Boolean, default=False, name='flexible_schedule')
+    days = Column(type_=types.Integer,nullable=False, name='days')
     result = Column(type_=types.ARRAY(types.JSON), nullable=False)
 
     userId = Column(ForeignKey(column='users.id'), type_=types.UUID, nullable=False, name='user_id')
