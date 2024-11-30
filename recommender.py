@@ -45,6 +45,12 @@ class TalentRecommender:
         self.model = NearestNeighbors(n_neighbors=5, metric='cosine')
         self.model.fit(self.X)
 
+    def get_enum_name_by_value(self, enum_class, value):        
+        for name, member in enum_class.__members__.items():            
+            if int(member.value) == value:
+                return name
+        return None
+
     def map_seniority(self, seniority_str):
         try:
             return Seniority[seniority_str.upper()].value
@@ -52,8 +58,9 @@ class TalentRecommender:
             return Seniority.MID.value
 
     def invert_map_seniority(self, seniority_val):
+        print
         try:
-            return Seniority[seniority_val].name
+            return self.get_enum_name_by_value(Seniority, seniority_val)
         except (KeyError, AttributeError):
             return Seniority.MID.name
 
@@ -62,6 +69,12 @@ class TalentRecommender:
             return EnglishLevel[english_str.upper()].value
         except (KeyError, AttributeError):
             return EnglishLevel.PROFICIENT.value
+    
+    def invert_map_english(self, english_value):
+        try:
+            return self.get_enum_name_by_value(EnglishLevel, english_value)
+        except (KeyError, AttributeError):
+            return EnglishLevel.PROFICIENT.name
 
     def create_input_vector(self, request_data):
         # Initialize input vector with zeros
@@ -110,7 +123,7 @@ class TalentRecommender:
                 'similarity_score': round(float(1 / (1 + distance)), 3),
                 'weekly_available_hours': int(profile['weekly_available_hours']),
                 'seniority_level': self.invert_map_seniority(int(profile['seniority_level'])),
-                'english_level': int(profile['english_level']),
+                'english_level': self.invert_map_english(int(profile['english_level'])),
                 'tech_skills': tech_skills,
                 'assignment_avg': int(profile['assignment_avg']),
                 'active_assignments': int(profile['active_assignments'])
